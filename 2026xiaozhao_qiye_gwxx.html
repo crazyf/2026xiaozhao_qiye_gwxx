@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026年校招活动企业岗位信息表</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 20px;
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    background: #f7f8fa; color: #222;
+  }
+  h1 { font-size: 20px; margin: 0 0 14px; }
+
+  /* ===== 筛选区 ===== */
+  .filters {
+    background: #fff; border: 1px solid #e5e5e5; border-radius: 8px;
+    padding: 14px; margin-bottom: 14px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px 14px;
+  }
+  .filters label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+  .filters input, .filters select {
+    width: 100%; padding: 7px 9px; font-size: 13px;
+    border: 1px solid #d9d9d9; border-radius: 5px; outline: none; background: #fff;
+  }
+  .filters input:focus, .filters select:focus { border-color: #1677ff; }
+  .filter-actions { display: flex; align-items: flex-end; gap: 8px; }
+  .btn {
+    padding: 7px 14px; font-size: 13px; border-radius: 5px; cursor: pointer;
+    border: 1px solid #d9d9d9; background: #fff; color: #333;
+  }
+  .btn:hover { border-color: #1677ff; color: #1677ff; }
+  .btn-primary { background: #1677ff; border-color: #1677ff; color: #fff; }
+  .btn-primary:hover { background: #0f5fd6; color: #fff; }
+
+  /* ===== 状态 / 统计 ===== */
+  #status { font-size: 13px; color: #555; margin: 0 0 10px; line-height: 1.7; }
+  .error { color: #b00020; }
+
+  /* ===== 列表页 ===== */
+  .table-wrap {
+    background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; overflow: auto;
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td {
+    border-bottom: 1px solid #eee; padding: 9px 10px;
+    text-align: left; vertical-align: top;
+  }
+  th {
+    position: sticky; top: 0; z-index: 2;
+    background: #f0f2f5; font-weight: 600; white-space: nowrap;
+  }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover td { background: #eef6ff; }
+  td.desc {
+    white-space: normal; max-width: 340px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  td.nowrap { white-space: nowrap; }
+
+  /* ===== 分页 ===== */
+  .pager {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; flex-wrap: wrap; margin: 14px 0 4px;
+  }
+  .pager button {
+    min-width: 34px; height: 32px; padding: 0 10px; font-size: 13px;
+    border: 1px solid #d9d9d9; background: #fff; border-radius: 5px; cursor: pointer;
+  }
+  .pager button:hover:not(:disabled) { border-color: #1677ff; color: #1677ff; }
+  .pager button.active { background: #1677ff; border-color: #1677ff; color: #fff; }
+  .pager button:disabled { opacity: .45; cursor: not-allowed; }
+  .pager .info { font-size: 13px; color: #666; margin: 0 8px; }
+
+  /* ===== 详情页 ===== */
+  #detailPage { display: none; }
+  .detail-card {
+    background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 20px 24px;
+  }
+  .detail-title { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .detail-sub { font-size: 14px; color: #666; margin: 0 0 16px; }
+  .detail-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px 20px; margin-bottom: 18px;
+  }
+  .detail-item { font-size: 13px; line-height: 1.7; }
+  .detail-item .k { color: #888; display: block; font-size: 12px; margin-bottom: 2px; }
+  .detail-item .v { color: #222; word-break: break-word; }
+  .detail-block { margin-top: 18px; }
+  .detail-block .k { color: #888; font-size: 12px; margin-bottom: 6px; }
+  .detail-block .v {
+    font-size: 13px; line-height: 1.85; white-space: pre-wrap; word-break: break-word;
+    background: #fafafa; border: 1px solid #f0f0f0; border-radius: 6px; padding: 12px 14px;
+  }
+  .back-bar { margin-bottom: 14px; }
+  a { color: #1677ff; }
+</style>
+</head>
+<body>
+
+<!-- ============ 列表页 ============ -->
+<div id="listPage">
+  <h1>2026年校招活动企业岗位信息表</h1>
+
+  <div class="filters" id="filters">
+    <div>
+      <label>关键词（单位 / 职位 / 专业）</label>
+      <input type="text" id="fKeyword" placeholder="如：工程师 / 贵州大学 / 计算机">
+    </div>
+    <div>
+      <label>引才单位</label>
+      <select id="fUnit"><option value="">全部</option></select>
+    </div>
+    <div>
+      <label>学历学位要求</label>
+      <select id="fDegree"><option value="">全部</option></select>
+    </div>
+    <div>
+      <label>工作地区（市州）</label>
+      <select id="fCity"><option value="">全部</option></select>
+    </div>
+    <div>
+      <label>工作地区（区县）</label>
+      <select id="fDistrict"><option value="">全部</option></select>
+    </div>
+    <div>
+      <label>最低薪资（不低于）</label>
+      <input type="number" id="fSalary" placeholder="如：5000">
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-primary" id="btnSearch">筛选</button>
+      <button class="btn" id="btnReset">重置</button>
+    </div>
+  </div>
+
+  <div id="status">正在读取 Excel...</div>
+  <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;margin-bottom:10px;">
+
+  <div class="table-wrap">
+    <table id="listTable">
+      <thead id="listHead"></thead>
+      <tbody id="listBody"></tbody>
+    </table>
+  </div>
+
+  <div class="pager" id="pager"></div>
+</div>
+
+<!-- ============ 详情页 ============ -->
+<div id="detailPage">
+  <div class="back-bar">
+    <button class="btn" id="btnBack">← 返回列表</button>
+  </div>
+  <div class="detail-card" id="detailCard"></div>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+/* ================== 配置 ================== */
+const EXCEL_FILE_NAME = '2026年校招活动企业岗位信息表.xlsx';
+const PAGE_SIZE = 20;                 // 每页 20 条
+const SHEET_NAME  = '';               // 留空=第一个工作表；也可写死表名
+
+/* 表头 -> 内部字段名映射（按你给的表头顺序） */
+const HEADERS = [
+  '序号','引才单位','职位名称','职位描述','需求人数','专业','学历学位要求',
+  '年龄要求','薪资类别','最低薪资','最高薪资','福利待遇',
+  '岗位急需紧缺指数','引进方式','工作地区（市州）','工作地区（区县）',
+  '联系人','联系电话','投递邮箱'
+];
+
+/* 列表页展示哪些列（想全展示就改成 HEADERS） */
+const LIST_COLUMNS = [
+  '序号','引才单位','职位名称','需求人数','专业','学历学位要求',
+  '最低薪资','最高薪资','工作地区（市州）','工作地区（区县）','引进方式'
+];
+
+/* ================== 状态 ================== */
+let RAW = [];        // 全量数据（对象数组）
+let FILTERED = [];   // 筛选后的数据
+let CURRENT_PAGE = 1;
+
+/* ================== 元素 ================== */
+const $ = id => document.getElementById(id);
+const listPage = $('listPage'), detailPage = $('detailPage');
+const statusEl = $('status'), fileInputEl = $('fileInput');
+const listHead = $('listHead'), listBody = $('listBody'), pagerEl = $('pager');
+const detailCard = $('detailCard');
+
+/* ================== 读取 Excel ================== */
+async function autoLoad() {
+  try {
+    statusEl.textContent = '正在读取同目录 Excel 文件...';
+    const res = await fetch(encodeURIComponent(EXCEL_FILE_NAME), { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const buf = await res.arrayBuffer();
+    parseWorkbook(buf);
+  } catch (err) {
+    statusEl.innerHTML =
+      '自动读取失败：<span class="error">' + err.message + '</span><br>' +
+      '若直接双击 HTML 打开，浏览器会因安全限制无法读取本地文件。请用本地服务器打开，' +
+      '或点击下方按钮手动选择 Excel 文件。';
+    fileInputEl.style.display = 'inline-block';
+  }
+}
+
+fileInputEl.addEventListener('change', async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    statusEl.textContent = '正在读取：' + f.name;
+    parseWorkbook(await f.arrayBuffer());
+  } catch (err) {
+    statusEl.innerHTML = '读取失败：<span class="error">' + err.message + '</span>';
+  }
+});
+
+function parseWorkbook(arrayBuffer) {
+  const wb = XLSX.read(arrayBuffer, { type: 'array' });
+  if (!wb.SheetNames.length) throw new Error('工作簿中没有工作表');
+
+  const sheetName = SHEET_NAME || wb.SheetNames[0];
+  const ws = wb.Sheets[sheetName];
+  if (!ws) throw new Error('找不到工作表：' + sheetName);
+
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+  if (!rows.length) { statusEl.textContent = '工作表中没有数据。'; return; }
+
+  // 找到表头行：取第一行非空行
+  let headerIndex = 0;
+  while (headerIndex < rows.length && rows[headerIndex].every(c => String(c).trim() === '')) headerIndex++;
+  const headerRow = rows[headerIndex].map(c => String(c).trim());
+
+  // 建列索引：优先用固定表头顺序，兜底用 Excel 实际表头
+  const colIndex = {};
+  HEADERS.forEach(h => {
+    let i = headerRow.indexOf(h);
+    if (i === -1) i = HEADERS.indexOf(h);   // 表头对不上时按位置兜底
+    colIndex[h] = i;
+  });
+
+  const data = [];
+  for (let i = headerIndex + 1; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || r.every(c => String(c).trim() === '')) continue;
+    const obj = {};
+    HEADERS.forEach(h => { obj[h] = (r[colIndex[h]] ?? '').toString().trim(); });
+    // 跳过完全空记录
+    if (HEADERS.every(h => obj[h] === '')) continue;
+    data.push(obj);
+  }
+
+  RAW = data;
+  statusEl.textContent = '读取完成：工作表“' + sheetName + '”，共 ' + RAW.length + ' 条岗位信息。';
+
+  buildFilters();
+  applyFilters(true);
+}
+
+/* ================== 构建筛选下拉 ================== */
+function uniq(key) {
+  const set = new Set();
+  RAW.forEach(o => { if (o[key] !== '') set.add(o[key]); });
+  return [...set].sort((a, b) => a.localeCompare(b, 'zh-CN'));
+}
+function fillSelect(sel, values) {
+  sel.innerHTML = '<option value="">全部</option>' +
+    values.map(v => `<option value="${escAttr(v)}">${escHtml(v)}</option>`).join('');
+}
+function buildFilters() {
+  fillSelect($('fUnit'),     uniq('引才单位'));
+  fillSelect($('fDegree'),   uniq('学历学位要求'));
+  fillSelect($('fCity'),     uniq('工作地区（市州）'));
+  fillSelect($('fDistrict'), uniq('工作地区（区县）'));
+}
+
+/* ================== 筛选 ================== */
+function applyFilters(resetPage) {
+  const kw     = $('fKeyword').value.trim().toLowerCase();
+  const unit   = $('fUnit').value;
+  const degree = $('fDegree').value;
+  const city   = $('fCity').value;
+  const dist   = $('fDistrict').value;
+  const salary = parseFloat($('fSalary').value);
+
+  FILTERED = RAW.filter(o => {
+    if (unit   && o['引才单位'] !== unit) return false;
+    if (degree && o['学历学位要求'] !== degree) return false;
+    if (city   && o['工作地区（市州）'] !== city) return false;
+    if (dist   && o['工作地区（区县）'] !== dist) return false;
+
+    if (!isNaN(salary)) {
+      const min = parseFloat(String(o['最低薪资']).replace(/[^\d.\-]/g, ''));
+      if (isNaN(min) || min < salary) return false;
+    }
+    if (kw) {
+      const hay = (o['引才单位'] + ' ' + o['职位名称'] + ' ' + o['专业'] + ' ' + o['职位描述']).toLowerCase();
+      if (!hay.includes(kw)) return false;
+    }
+    return true;
+  });
+
+  if (resetPage) CURRENT_PAGE = 1;
+  const totalPages = Math.max(1, Math.ceil(FILTERED.length / PAGE_SIZE));
+  if (CURRENT_PAGE > totalPages) CURRENT_PAGE = totalPages;
+
+  renderHead();
+  renderBody();
+  renderPager(totalPages);
+  statusEl.textContent = '共 ' + RAW.length + ' 条，筛选后 ' + FILTERED.length +
+    ' 条，第 ' + CURRENT_PAGE + ' / ' + totalPages + ' 页（每页 ' + PAGE_SIZE + ' 条）。';
+}
+
+/* ================== 渲染列表 ================== */
+function renderHead() {
+  listHead.innerHTML = '<tr>' +
+    LIST_COLUMNS.map(h => `<th>${escHtml(h)}</th>`).join('') +
+    '<th>操作</th></tr>';
+}
+
+function renderBody() {
+  const start = (CURRENT_PAGE - 1) * PAGE_SIZE;
+  const pageData = FILTERED.slice(start, start + PAGE_SIZE);
+
+  if (!pageData.length) {
+    listBody.innerHTML = `<tr><td colspan="${LIST_COLUMNS.length + 1}"
+      style="padding:24px;text-align:center;color:#999;">没有符合条件的岗位</td></tr>`;
+    return;
+  }
+
+  listBody.innerHTML = pageData.map((o, i) => {
+    const globalIndex = RAW.indexOf(o);
+    const tds = LIST_COLUMNS.map(h => {
+      const val = o[h] ?? '';
+      if (h === '职位描述') return `<td class="desc">${escHtml(val)}</td>`;
+      return `<td class="${h === '引才单位' || h === '职位名称' ? '' : 'nowrap'}">${escHtml(val)}</td>`;
+    }).join('');
+    return `<tr data-idx="${globalIndex}" data-page="${i}">${tds}
+      <td class="nowrap"><button class="btn btn-primary" data-detail="${globalIndex}">查看详情</button></td></tr>`;
+  }).join('');
+
+  // 点整行也能进详情
+  listBody.querySelectorAll('tr[data-idx]').forEach(tr => {
+    tr.addEventListener('click', () => openDetail(Number(tr.dataset.idx)));
+  });
+}
+
+/* ================== 分页 ================== */
+function renderPager(totalPages) {
+  const cur = CURRENT_PAGE;
+  let html = '';
+
+  html += `<button ${cur === 1 ? 'disabled' : ''} data-page="1">首页</button>`;
+  html += `<button ${cur === 1 ? 'disabled' : ''} data-page="${cur - 1}">上一页</button>`;
+
+  // 页码窗口：当前页前后各 2 页
+  let s = Math.max(1, cur - 2), e = Math.min(totalPages, cur + 2);
+  if (s > 1) html += `<span class="info">…</span>`;
+  for (let p = s; p <= e; p++) {
+    html += `<button class="${p === cur ? 'active' : ''}" data-page="${p}">${p}</button>`;
+  }
+  if (e < totalPages) html += `<span class="info">…</span>`;
+
+  html += `<button ${cur === totalPages ? 'disabled' : ''} data-page="${cur + 1}">下一页</button>`;
+  html += `<button ${cur === totalPages ? 'disabled' : ''} data-page="${totalPages}">末页</button>`;
+  html += `<span class="info">共 ${totalPages} 页</span>`;
+
+  pagerEl.innerHTML = html;
+
+  pagerEl.querySelectorAll('button[data-page]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = Number(btn.dataset.page);
+      if (p >= 1 && p <= totalPages && p !== CURRENT_PAGE) {
+        CURRENT_PAGE = p;
+        applyFilters(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  });
+}
+
+/* ================== 详情页 ================== */
+function openDetail(idx) {
+  const o = RAW[idx];
+  if (!o) return;
+
+  const title = o['职位名称'] || '（未填写职位名称）';
+  const sub = o['引才单位'] || '';
+
+  // 需要以"卡片字段"形式展示的项
+  const cardFields = [
+    ['需求人数', '需求人数'],
+    ['专业', '专业'],
+    ['学历学位要求', '学历学位要求'],
+    ['年龄要求', '年龄要求'],
+    ['薪资类别', '薪资类别'],
+    ['最低薪资', '最低薪资'],
+    ['最高薪资', '最高薪资'],
+    ['岗位急需紧缺指数', '岗位急需紧缺指数'],
+    ['引进方式', '引进方式'],
+    ['工作地区（市州）', '工作地区（市州）'],
+    ['工作地区（区县）', '工作地区（区县）'],
+    ['联系人', '联系人'],
+    ['联系电话', '联系电话'],
+    ['投递邮箱', '投递邮箱']
+  ];
+
+  let html = '';
+  html += `<div class="detail-title">${escHtml(title)}</div>`;
+  html += `<div class="detail-sub">${escHtml(sub)}</div>`;
+  html += `<div class="detail-grid">`;
+  cardFields.forEach(([label, key]) => {
+    const v = o[key] ?? '';
+    if (v === '') return;   // 空的就不显示
+    let valHtml = escHtml(v);
+    if (key === '投递邮箱') valHtml = `<a href="mailto:${escAttr(v)}">${escHtml(v)}</a>`;
+    if (key === '联系电话') valHtml = `<a href="tel:${escAttr(v)}">${escHtml(v)}</a>`;
+    html += `<div class="detail-item"><span class="k">${escHtml(label)}</span><span class="v">${valHtml}</span></div>`;
+  });
+  html += `</div>`;
+
+  if (o['职位描述']) {
+    html += `<div class="detail-block"><div class="k">职位描述</div>
+             <div class="v">${escHtml(o['职位描述'])}</div></div>`;
+  }
+  if (o['福利待遇']) {
+    html += `<div class="detail-block"><div class="k">福利待遇</div>
+             <div class="v">${escHtml(o['福利待遇'])}</div></div>`;
+  }
+
+  detailCard.innerHTML = html;
+  listPage.style.display = 'none';
+  detailPage.style.display = 'block';
+  window.scrollTo({ top: 0 });
+}
+
+$('btnBack').addEventListener('click', () => {
+  detailPage.style.display = 'none';
+  listPage.style.display = 'block';
+});
+
+/* ================== 事件绑定 ================== */
+$('btnSearch').addEventListener('click', () => applyFilters(true));
+$('btnReset').addEventListener('click', () => {
+  $('fKeyword').value = '';
+  $('fUnit').value = '';
+  $('fDegree').value = '';
+  $('fCity').value = '';
+  $('fDistrict').value = '';
+  $('fSalary').value = '';
+  applyFilters(true);
+});
+// 输入框回车即筛选
+$('fKeyword').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(true); });
+$('fSalary').addEventListener('keydown',  e => { if (e.key === 'Enter') applyFilters(true); });
+
+/* ================== 工具 ================== */
+function escHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function escAttr(s) { return escHtml(s); }
+
+/* ================== 启动 ================== */
+autoLoad();
+</script>
+</body>
+</html>
