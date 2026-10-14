@@ -38,17 +38,25 @@ body{
 /* ============ 筛选面板 ============ */
 .filters{
   background:var(--panel); border-radius:var(--radius);
-  box-shadow:var(--shadow); padding:14px; margin-bottom:14px;
+  box-shadow:var(--shadow); padding:16px 16px 14px; margin-bottom:14px;
 }
-.filters-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.filters-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 14px;}
 @media(max-width:600px){ .filters-grid{grid-template-columns:1fr;} }
-.field{display:flex;flex-direction:column;gap:5px;min-width:0;}
-.field .lbl{font-size:12px;color:var(--muted);font-weight:600;}
+
+.field{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.field .lbl{font-size:13px;color:#3a4b66;font-weight:700;letter-spacing:.2px;}
+.field .input-wrap{position:relative;}
+.field .input-wrap .prefix{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-size:14px;color:#b6c2d4;pointer-events:none;line-height:1;
+}
 .field input,.field select{
   height:42px;width:100%;border:1px solid var(--line);border-radius:10px;
-  padding:0 11px;font-size:15px;color:var(--text);background:#fbfcfe;
+  padding:0 12px;font-size:14.5px;color:var(--text);background:#fbfcfe;
   outline:none;font-family:inherit;transition:.16s;
 }
+.field .input-wrap input{padding-left:34px;}
+.field input::placeholder{color:#b6c2d4;}
 .field input:focus,.field select:focus{
   border-color:var(--brand);background:#fff;
   box-shadow:0 0 0 3px rgba(21,82,216,.12);
@@ -56,25 +64,111 @@ body{
 .field select{
   cursor:pointer;appearance:none;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%237a879c' stroke-width='1.6' stroke-linecap='round'/></svg>");
-  background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;
+  color:#9aa7bb;
 }
-.filters-actions{
-  display:flex;gap:10px;flex-wrap:wrap;
-  margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);
+.field select.has-value{color:var(--text);}
+
+/* ============ 筛选底部：标签区 + 重置按钮 ============ */
+.filters-footer{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px dashed var(--line);
+  min-height:44px;
 }
-.btn{
-  height:42px;padding:0 20px;border-radius:10px;border:1px solid var(--line);
-  background:#fff;color:#2b3b55;font-size:14px;font-weight:600;
-  cursor:pointer;font-family:inherit;transition:.16s;
-  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+.filter-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  flex:1;
+  min-width:0;
+  align-items:flex-start;
 }
-.btn:hover{border-color:#c3d3ee;background:#f5f8ff;}
-.btn.primary{
-  background:linear-gradient(135deg,var(--brand),var(--brand2));
-  border-color:transparent;color:#fff;
-  box-shadow:0 4px 12px rgba(21,82,216,.22);
+.filter-tags:empty::before{
+  content:"无筛选条件";
+  font-size:12.5px;
+  color:#c0c9d8;
+  padding-top:6px;
 }
-.btn.primary:hover{filter:brightness(1.06);}
+
+.filter-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 6px 4px 12px;
+  background:#eef4ff;
+  border:1px solid #d5e2ff;
+  border-radius:20px;
+  font-size:12.5px;
+  color:#1d4fd7;
+  font-weight:600;
+  line-height:18px;
+  max-width:100%;
+  animation:tagIn .18s ease;
+}
+@keyframes tagIn{
+  from{transform:scale(.9);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+.filter-tag .txt{
+  max-width:180px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.filter-tag .close{
+  width:18px;height:18px;
+  border-radius:50%;
+  border:none;
+  background:#cfdeff;
+  color:#1d4fd7;
+  font-size:12px;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  padding:0;
+  flex:none;
+  transition:.15s;
+  font-family:inherit;
+}
+.filter-tag .close:hover{background:#1d4fd7;color:#fff;}
+.filter-tag .close:active{transform:scale(.9);}
+
+/* 重置按钮：右下角，浅色描边样式（避免误认为查询按钮） */
+.btn-reset{
+  height:40px;
+  padding:0 18px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#fff;
+  color:#5b6b82;
+  font-size:13.5px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+  flex:none;
+  transition:.16s;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.btn-reset:hover{
+  border-color:#c3d3ee;
+  background:#f7faff;
+  color:var(--brand);
+}
+.btn-reset:active{transform:scale(.97);}
+
+@media(max-width:480px){
+  .filters-footer{flex-direction:column;align-items:stretch;}
+  .btn-reset{align-self:flex-end;}
+}
 
 /* ============ 工具条 ============ */
 .toolbar{
@@ -93,18 +187,15 @@ body{
   position:relative;
   background:var(--panel);
   border:1px solid var(--line);
-  border-left:4px solid var(--brand);        /* 左侧强调条 */
+  border-left:4px solid var(--brand);
   border-radius:var(--radius-sm);
-  padding:14px 16px 14px 16px;
+  padding:14px 16px;
   cursor:pointer;
   box-shadow:var(--shadow-card);
   transition:transform .16s, box-shadow .16s, border-color .16s;
   overflow:hidden;
 }
-.card:active{
-  transform:scale(.985);
-  background:#fafcff;
-}
+.card:active{transform:scale(.985);background:#fafcff;}
 @media(hover:hover){
   .card:hover{
     border-color:#c9d8f5;
@@ -114,18 +205,13 @@ body{
   }
   .card:hover .arrow{color:var(--brand);transform:translate(2px,-50%);}
 }
-
-/* 右上角箭头 */
 .card .arrow{
   position:absolute;right:12px;top:18px;
   font-size:20px;color:#cfd8e8;font-weight:300;line-height:1;
   transition:transform .16s, color .16s;
 }
 
-/* ---- 卡片头部：职位名称 + 学历标签 ---- */
-.card-top{
-  padding-right:18px;
-}
+.card-top{padding-right:18px;}
 .job-title{
   margin:0 0 6px 0;
   font-size:16px;font-weight:700;color:#0f2f63;
@@ -141,7 +227,6 @@ body{
 .tag-博士{color:#6d28d9;background:#f3ebff;border-color:#ddc9fb;}
 .tag-plain{color:#7a879c;background:#f2f5fa;border-color:#e4eaf3;}
 
-/* ---- 引才单位 ---- */
 .unit{
   margin-top:8px;
   font-size:14px;font-weight:600;color:#22385c;
@@ -150,7 +235,6 @@ body{
 }
 .unit .ico{flex:none;line-height:1.45;}
 
-/* ---- 信息行（专业 / 学历） ---- */
 .card-line{
   display:flex;align-items:flex-start;gap:8px;
   margin-top:6px;font-size:13.5px;line-height:1.5;
@@ -166,7 +250,6 @@ body{
   -webkit-box-orient:vertical;overflow:hidden;
 }
 
-/* ---- 薪资区（独立色块） ---- */
 .salary-block{
   margin-top:12px;
   background:linear-gradient(135deg,#fff8f2,#fff4ea);
@@ -179,21 +262,14 @@ body{
 }
 .salary-item{min-width:0;display:flex;flex-direction:column;gap:2px;}
 .salary-item .k{
-  font-size:11.5px;color:#c98a5a;font-weight:700;
-  letter-spacing:.2px;
+  font-size:11.5px;color:#c98a5a;font-weight:700;letter-spacing:.2px;
 }
 .salary-item .v{
   font-size:15px;color:#c2410c;font-weight:700;
   word-break:break-word;line-height:1.25;
 }
-.salary-item .v.empty{
-  color:#d4b8a3;font-weight:500;font-size:13.5px;
-}
-
-/* 极窄屏（< 360px）薪资改为单列堆叠 */
-@media(max-width:359px){
-  .salary-block{grid-template-columns:1fr;}
-}
+.salary-item .v.empty{color:#d4b8a3;font-weight:500;font-size:13.5px;}
+@media(max-width:359px){ .salary-block{grid-template-columns:1fr;} }
 
 /* ============ 空状态 ============ */
 .empty{
@@ -251,9 +327,7 @@ body{
 .detail-grid{
   display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;
 }
-@media(max-width:640px){
-  .detail-grid{grid-template-columns:1fr;padding:12px;}
-}
+@media(max-width:640px){ .detail-grid{grid-template-columns:1fr;padding:12px;} }
 .d-item{
   background:#f7f9fd;border-radius:10px;padding:11px 13px;min-width:0;
 }
@@ -311,15 +385,24 @@ body{
       <div class="filters-grid">
         <label class="field">
           <span class="lbl">引才单位</span>
-          <input id="fUnit" type="text" placeholder="输入单位名称关键词">
+          <div class="input-wrap">
+            <span class="prefix">🏢</span>
+            <input id="fUnit" type="text" placeholder="输入单位名称关键词">
+          </div>
         </label>
         <label class="field">
           <span class="lbl">职位名称</span>
-          <input id="fJob" type="text" placeholder="输入职位名称关键词">
+          <div class="input-wrap">
+            <span class="prefix">💼</span>
+            <input id="fJob" type="text" placeholder="输入职位名称关键词">
+          </div>
         </label>
         <label class="field">
           <span class="lbl">专业</span>
-          <input id="fMajor" type="text" placeholder="如：计算机、机械、临床医学">
+          <div class="input-wrap">
+            <span class="prefix">🎓</span>
+            <input id="fMajor" type="text" placeholder="如：计算机、机械、临床医学">
+          </div>
         </label>
         <label class="field">
           <span class="lbl">学历</span>
@@ -332,8 +415,10 @@ body{
         </label>
       </div>
 
-      <div class="filters-actions">
-        <button class="btn primary" id="btnReset">重置条件</button>
+      <!-- 底部：标签区 + 右下角重置按钮 -->
+      <div class="filters-footer">
+        <div class="filter-tags" id="filterTags"></div>
+        <button class="btn-reset" id="btnReset">重置全部条件</button>
       </div>
     </section>
 
@@ -393,6 +478,14 @@ const FIELD_DEFS = [
 
 const FULL_FIELDS     = ['职位描述','福利待遇'];
 const HIDE_IN_DETAIL  = ['序号'];
+
+/* ★ 筛选条件定义：用于生成可删除标签 */
+const FILTER_DEFS = [
+  { id:'fUnit',   label:'引才单位' },
+  { id:'fJob',    label:'职位名称' },
+  { id:'fMajor',  label:'专业' },
+  { id:'fDegree', label:'学历' }
+];
 
 let DATA = [];
 let VIEW = [];
@@ -517,7 +610,43 @@ function filterData(){
   });
 }
 
+/* =========================================================
+   ★ 更新筛选标签（每个已生效的条件生成一个小角标）
+   ========================================================= */
+function updateFilterTags(){
+  const container = $('filterTags');
+  const parts = [];
+
+  FILTER_DEFS.forEach(def => {
+    const el = $(def.id);
+    const val = (el.value || '').trim();
+    if(!val) return;
+
+    parts.push(
+      '<span class="filter-tag" data-for="' + def.id + '">' +
+        '<span class="txt">' + esc(def.label) + ' · ' + esc(val) + '</span>' +
+        '<button class="close" data-clear="' + def.id + '" title="删除此条件" aria-label="删除">×</button>' +
+      '</span>'
+    );
+  });
+
+  container.innerHTML = parts.join('');
+
+  /* 下拉框有值时让文字变深色，更易读 */
+  FILTER_DEFS.forEach(def => {
+    const el = $(def.id);
+    if(el.tagName === 'SELECT'){
+      if(el.value) el.classList.add('has-value');
+      else el.classList.remove('has-value');
+    }
+  });
+}
+
+/* =========================================================
+   列表渲染
+   ========================================================= */
 function renderList(){
+  updateFilterTags();           // 每次筛选都同步标签
   VIEW = filterData();
 
   const total      = VIEW.length;
@@ -539,7 +668,6 @@ function renderList(){
     return;
   }
 
-  /* ★ 手机端卡片：仅展示 6 个字段 */
   $('list').innerHTML = slice.map(r => {
     const tagsHtml = degreeTags(r._degrees);
     const majorTxt = r['专业'] || '—';
@@ -548,32 +676,22 @@ function renderList(){
     return '' +
     '<article class="card" data-id="' + r._id + '">' +
       '<span class="arrow">›</span>' +
-
-      /* 头部：职位名称 + 学历标签 */
       '<div class="card-top">' +
         '<h3 class="job-title">' + esc(r['职位名称'] || '（未填写职位名称）') + '</h3>' +
         '<div class="tag-tags">' + tagsHtml + '</div>' +
       '</div>' +
-
-      /* 引才单位 */
       '<div class="unit">' +
         '<span class="ico">🏢</span>' +
         '<span>' + esc(r['引才单位'] || '—') + '</span>' +
       '</div>' +
-
-      /* 专业 */
       '<div class="card-line">' +
         '<span class="k">专业</span>' +
         '<span class="v clamp">' + esc(majorTxt) + '</span>' +
       '</div>' +
-
-      /* 学历要求 */
       '<div class="card-line">' +
         '<span class="k">学历要求</span>' +
         '<span class="v">' + esc(r['学历'] || '不限') + '</span>' +
       '</div>' +
-
-      /* 薪资色块：最低 / 最高 */
       '<div class="salary-block">' +
         '<div class="salary-item">' +
           '<div class="k">最低薪资</div>' +
@@ -614,6 +732,9 @@ function renderPager(totalPages){
   $('pager').innerHTML = html;
 }
 
+/* =========================================================
+   详情页
+   ========================================================= */
 function showDetail(id){
   const r = DATA.find(x => x._id === id);
   if(!r) return;
@@ -670,6 +791,7 @@ function resetFilters(doRender){
   $('fDegree').value = '';
   page = 1;
   if(doRender !== false) renderList();
+  else updateFilterTags();
 }
 
 function bind(){
@@ -684,6 +806,23 @@ function bind(){
 
   $('fDegree').addEventListener('change', () => { page = 1; renderList(); });
   $('btnReset').addEventListener('click', () => resetFilters(true));
+
+  /* ★ 点击标签上的 × 删除该条件 */
+  $('filterTags').addEventListener('click', ev => {
+    const btn = ev.target.closest('.close');
+    if(!btn) return;
+    const id = btn.dataset.clear;
+    const el = $(id);
+    if(!el) return;
+    el.value = '';
+    page = 1;
+    renderList();
+
+    /* 若删除的是文本框，让其重新聚焦，方便继续输入 */
+    if(el.tagName === 'INPUT'){
+      try{ el.focus(); }catch(e){}
+    }
+  });
 
   $('list').addEventListener('click', ev => {
     const card = ev.target.closest('.card');
